@@ -54,6 +54,7 @@ services:
         condition: service_healthy
     volumes:
       - static:/var/www/static:ro
+      - ./frontend:/var/www/frontend:ro
 
 volumes:
   pgdata:
