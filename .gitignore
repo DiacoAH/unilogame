@@ -1,0 +1,10 @@
+.env
+backups/
+staticfiles/
+__pycache__/
+*.py[cod]
+*.pyc
+*.egg-info/
+.venv/
+.uv-cache/
+.env.local

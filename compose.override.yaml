@@ -1,0 +1,21 @@
+services:
+  db:
+    ports:
+      - '127.0.0.1:5432:5432'
+
+  web:
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      DJANGO_DEBUG: '1'
+    volumes:
+      - ./backend:/app
+
+  bot:
+    volumes:
+      - ./bot:/app
+
+  nginx:
+    ports:
+      - '8080:80'
+    volumes:
+      - ./nginx/dev.conf:/etc/nginx/conf.d/default.conf:ro
