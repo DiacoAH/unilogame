@@ -48,6 +48,7 @@ services:
       BOT_TOKEN: ${BOT_TOKEN}
       WEBAPP_URL: ${WEBAPP_URL}
       INTERNAL_API_SECRET: ${INTERNAL_API_SECRET}
+      BOT_USERNAME: ${BOT_USERNAME}
 
   nginx:
     image: nginx:stable-alpine
