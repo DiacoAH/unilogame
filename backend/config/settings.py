@@ -12,7 +12,7 @@ if not DEBUG and not SECRET_KEY:
     raise ImproperlyConfigured('DJANGO_SECRET_KEY is required when DEBUG is off')
 
 ALLOWED_HOSTS = [h.strip() for h in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if h.strip()]
-ALLOWED_HOSTS += ['localhost', '127.0.0.1']
+ALLOWED_HOSTS += ['localhost', '127.0.0.1', 'web']
 ALLOWED_HOSTS = list(dict.fromkeys(ALLOWED_HOSTS))
 
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if o.strip()]
