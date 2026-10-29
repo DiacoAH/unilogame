@@ -45,3 +45,6 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     objects = UserManager()
+
+    def __str__(self) -> str:
+        return str(self.telegram_id)
