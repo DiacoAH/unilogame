@@ -98,8 +98,8 @@ class Referral(models.Model):
     referrer = models.ForeignKey(
         User, related_name='referrals_given', on_delete=models.CASCADE
     )
-    referee = models.ForeignKey(
-        User, related_name='referrals_received', on_delete=models.CASCADE, unique=True
+    referee = models.OneToOneField(
+        User, related_name='referrals_received', on_delete=models.CASCADE
     )
     created_at = models.DateTimeField(auto_now_add=True)
     rewarded = models.BooleanField(default=False)
