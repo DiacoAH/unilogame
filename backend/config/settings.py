@@ -24,7 +24,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'users',
 ]
+
+AUTH_USER_MODEL = 'users.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -32,6 +35,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'users.middleware.TmaAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     # XFrameOptionsMiddleware removed: Telegram iframes need CSP frame-ancestors (set by nginx)
 ]
@@ -82,6 +86,10 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Telegram Mini App authentication
+INTERNAL_API_SECRET = os.environ.get('INTERNAL_API_SECRET', '')
+TMA_AUTH_DATE_MAX_AGE_SECONDS = int(os.environ.get('TMA_AUTH_DATE_MAX_AGE_SECONDS', '3600'))
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True

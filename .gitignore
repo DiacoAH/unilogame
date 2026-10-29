@@ -8,3 +8,4 @@ __pycache__/
 .venv/
 .uv-cache/
 .env.local
+docs/

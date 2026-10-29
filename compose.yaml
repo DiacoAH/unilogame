@@ -27,6 +27,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      INTERNAL_API_SECRET: ${INTERNAL_API_SECRET}
+      TMA_AUTH_DATE_MAX_AGE_SECONDS: ${TMA_AUTH_DATE_MAX_AGE_SECONDS}
     depends_on:
       db:
         condition: service_healthy
@@ -45,6 +47,7 @@ services:
     environment:
       BOT_TOKEN: ${BOT_TOKEN}
       WEBAPP_URL: ${WEBAPP_URL}
+      INTERNAL_API_SECRET: ${INTERNAL_API_SECRET}
 
   nginx:
     image: nginx:stable-alpine

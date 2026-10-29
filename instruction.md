@@ -19,7 +19,7 @@ bot (aiogram, long polling) --HTTPS, outbound only--> api.telegram.org
 ```
 
 - Only nginx publishes ports to the host in production. db, web and bot are never published.
-- The bot does **not** talk to Django or the database. Its only job: on /start, send a message with a button that opens the mini app. It needs only BOT\_TOKEN and WEBAPP\_URL.
+- The bot does **not** talk to Django or the database directly. Its only job: on /start, send a message with a button that opens the mini app, and call an internal backend endpoint to register the user. It needs BOT\_TOKEN, WEBAPP\_URL, and INTERNAL\_API\_SECRET.
 - The bot uses long polling (no webhook), so nginx has no route for the bot.
 - Telegram mini apps require HTTPS. Production needs a real domain and a TLS certificate; development uses a tunnel (Cloudflare Tunnel or ngrok) pointed at nginx.
 - Assumption: the mini app frontend is served by Django (templates and static files). Do not build a separate JS frontend service.
@@ -96,9 +96,9 @@ If a Django project already exists, keep its structure and adapt paths. The proj
 ### 4.3 bot (aiogram 3)
 
 - Built from bot/Dockerfile: python:3.13-slim, non-root user, pinned requirements (aiogram 3.x only).
-- Environment: BOT\_TOKEN and WEBAPP\_URL only. No database credentials, no Django secrets.
-- Behavior: /start replies with a short welcome and an inline button (label Play) that opens WEBAPP\_URL as a web app. At startup also set the chat menu button to the same web app. Then run long polling. Log to stdout.
-- No HTTP calls to the backend and no use of the requests library.
+- Environment: BOT\_TOKEN, WEBAPP\_URL, and INTERNAL\_API\_SECRET. No database credentials, no Django secrets.
+- Behavior: /start replies with a short welcome and an inline button (label Play) that opens WEBAPP\_URL as a web app. After sending the message, the bot also calls the backend ``POST /api/internal/users/`` with JSON ``{"telegram_id": <id>}`` and the ``X-Internal-Secret`` header to register the user. At startup also set the chat menu button to the same web app. Then run long polling. Log to stdout. Best-effort: the backend call never crashes the /start handler.
+- No HTTP calls to the backend beyond the best-effort user registration on /start, and no use of the requests library (stdlib urllib only).
 - Never run two instances with the same token at once (Telegram returns a conflict error). Use two separate bots in BotFather: one token for dev, one for prod.
 - restart: unless-stopped.
 
@@ -421,6 +421,5 @@ up, down, build, logs, ps, migrate, superuser (createsuperuser), shell (Django s
 
 ## 13. Later (do not implement now)
 
-- Telegram initData validation in Django for mini app requests.
 - Notifications: Django will call the Telegram Bot API directly, driven by a small notifier service. Not part of this task.
 - Webhook mode for the bot, if polling ever becomes a problem.
