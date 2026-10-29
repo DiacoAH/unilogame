@@ -1,5 +1,27 @@
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import UserManager
 from django.db import models
+
+
+class UserManager(UserManager):
+    use_in_migrations = True
+
+    def create_superuser(self, username=None, email=None, password=None, **extra_fields):
+        # Django's createsuperuser command passes the USERNAME_FIELD value
+        # (telegram_id) as a keyword argument, but UserManager.create_superuser
+        # expects 'username' as the first positional argument. Map it.
+        user_model = self.model
+        username_field = user_model.USERNAME_FIELD
+        if username is None:
+            username = extra_fields.pop(username_field, None)
+        if username is None:
+            raise TypeError(
+                f"create_superuser() missing 1 required positional argument: '{username_field}'"
+            )
+        extra_fields[username_field] = username
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        return self._create_user(username, email, password, **extra_fields)
 
 
 class User(AbstractUser):
@@ -21,3 +43,5 @@ class User(AbstractUser):
 
     USERNAME_FIELD = "telegram_id"
     REQUIRED_FIELDS = []
+
+    objects = UserManager()
