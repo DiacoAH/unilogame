@@ -1,34 +1,34 @@
 .PHONY: up down build logs ps migrate superuser shell psql prod-up prod-down prod-logs
 
-COMPOSE=docker compose
-PROD_COMPOSE=docker compose -f compose.yaml -f compose.prod.yaml
+DEV_COMPOSE=docker compose -p unilogame-dev --env-file .env
+PROD_COMPOSE=docker compose -p unilogame-prod --env-file .env.prod -f compose.yaml -f compose.prod.yaml
 
 up:
-	$(COMPOSE) up --build
+	$(DEV_COMPOSE) up --build
 
 down:
-	$(COMPOSE) down
+	$(DEV_COMPOSE) down
 
 build:
-	$(COMPOSE) build
+	$(DEV_COMPOSE) build
 
 logs:
-	$(COMPOSE) logs -f
+	$(DEV_COMPOSE) logs -f
 
 ps:
-	$(COMPOSE) ps
+	$(DEV_COMPOSE) ps
 
 migrate:
-	$(COMPOSE) exec web python manage.py migrate
+	$(DEV_COMPOSE) exec web python manage.py migrate
 
 superuser:
-	$(COMPOSE) exec web python manage.py createsuperuser
+	$(DEV_COMPOSE) exec web python manage.py createsuperuser
 
 shell:
-	$(COMPOSE) exec web python manage.py shell
+	$(DEV_COMPOSE) exec web python manage.py shell
 
 psql:
-	$(COMPOSE) exec db psql -U $${POSTGRES_USER} -d $${POSTGRES_DB}
+	$(DEV_COMPOSE) exec db psql -U $${POSTGRES_USER} -d $${POSTGRES_DB}
 
 prod-up:
 	$(PROD_COMPOSE) up --build

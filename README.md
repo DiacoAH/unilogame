@@ -55,6 +55,58 @@ This starts Nginx with a temporary self-signed cert, runs `certbot certonly` via
 
 Both run against the currently-started prod stack.
 
+## Running dev and prod simultaneously
+
+The dev and prod stacks are isolated by **Compose project names** (`-p`) and **separate env files** (`--env-file`), so they can run at the same time with no name collisions.
+
+- **Dev** — project `unilogame-dev`, env file `.env`:
+  ```bash
+  cp .env.example .env
+  make up
+  ```
+- **Prod** — project `unilogame-prod`, env file `.env.prod`:
+  ```bash
+  cp .env.prod.example .env.prod
+  # fill in real secrets (DJANGO_SECRET_KEY, POSTGRES_PASSWORD, BOT_TOKEN, INTERNAL_API_SECRET, ...)
+  make prod-up
+  ```
+
+Each stack's containers are prefixed by its project name, so you get two independent container sets:
+
+```text
+unilogame-dev-db
+unilogame-dev-web
+unilogame-dev-bot
+unilogame-dev-nginx
+unilogame-prod-db
+unilogame-prod-web
+unilogame-prod-bot
+unilogame-prod-nginx
+```
+
+Named volumes are also prefixed per project, so the databases and static/certbot data never mix:
+
+```text
+unilogame-dev_pgdata
+unilogame-prod_pgdata
+unilogame-dev_static
+unilogame-prod_certbot-www
+unilogame-prod_letsencrypt
+```
+
+**Port exposure (no overlap):**
+
+| Stack | Published ports |
+|---|---|
+| dev  | nginx `8080`, db `127.0.0.1:5432` |
+| prod | nginx `80`, `443` (no `5432`/`8000`) |
+
+**Tearing down:** `make down` / `make prod-down` stops only that stack's containers and keeps its volumes. `docker compose down -v` (scoped with `-p`) wipes only the current project's named volumes — it will **not** touch the other stack. To target one stack explicitly:
+
+```bash
+docker compose -p unilogame-prod --env-file .env.prod -f compose.yaml -f compose.prod.yaml down -v   # wipes only prod data
+```
+
 ## Backups
 
 ```bash

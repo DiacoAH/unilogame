@@ -1,4 +1,6 @@
 .env
+.env.prod
+.env.prod.local
 backups/
 staticfiles/
 __pycache__/
